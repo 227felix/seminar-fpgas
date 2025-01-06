@@ -1,0 +1,115 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}    % Font encoding
+\usepackage[ngerman]{babel} 
+
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}       
+
+% \newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO: #1}}}
+\usepackage{todonotes}
+\presetkeys{todonotes}{color=green!30, size=\small}{}
+
+% Page geometry
+\geometry{a4paper, margin=1in}
+
+
+\title{The glas half full -- Präsentation}
+\author{Felix Grenzing} 
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Einführung}
+
+Motivation:
+Traditionell skeptische Haltung gegenüber spezialisierter Hardware in Datenbanken.
+Herausforderungen: Kosten, Komplexität und eingeschränkte Anwendbarkeit.
+Neue Entwicklungen machen Hardware-Beschleunigung wieder interessant.
+\todo{Moore's Law und Stagnation der CPU-Leistung.}
+
+Kontext:
+Stagnation der CPU-Leistung und steigende Netzwerkgeschwindigkeiten.
+Heterogene Hardwarearchitekturen (z. B. FPGAs, TPUs) etablieren sich in Rechenzentren.
+
+\section{Herausforderungen früherer Ansätze}
+
+Limitierungen:
+Hohe Latenz durch Kommunikation über PCIe.
+\todo{Zahlen nennen}
+Um PCIe zu vermeiden, wird der gesamte Algorithmus auf den Beschleuniger ausgelagert, wobei Geschwindigkeitsvorteile verloren gehen, da
+nur Teile des Algorithmus gut zu dem Beschleuniger passen. Außerdem ist komplizierte Hardware nötig, um große if-else-Strukturen abzubilden.
+
+Einschränkungen der FPGA-Ressourcen (Speicher, Logikgatter).
+\todo{FPGA bisschen erklären und Daten nennen}
+Komplexität bei der Optimierung für Datenbank-Workloads.
+
+Vergleich zu CPUs:
+CPUs oft schneller bei iterativen oder verzweigten Algorithmen.
+\todo{Warum?}
+Unsicherheiten in der Query-Optimierung durch Hardware-Limitierungen.
+
+Spaltenbasierte Datenbanken können vielkern CPUs gut verwenden und reduzieren daher die Notwendigkeit von Beschleunigern.
+
+\section{Gründe für Optimismus}
+
+Technologische Entwicklungen:
+Verfügbarkeit von programmierbaren Co-Prozessoren (z. B. Intel Xeon+FPGA).
+\todo{Beispiele nennen}
+In-Datenpfad-Beschleunigung zur Reduktion der Datenbewegung.
+
+Neue Workloads:
+Datenbanken profitieren von hardwarebeschleunigter Verarbeitung für maschinelles Lernen und analytische Workloads, da dies
+häufig compute-bound sind, bspw.\ für low-latency Inferenz.
+Beispiel: SQL-Server mit Machine-Learning-Plugins.
+
+
+Ansätze, welche unabhängig von den Daten sind, helfen dem Optimizer, die beste Ausführungsstrategie zu finden. (LIKE Operator)
+
+
+\section{Ansätze}
+\begin{itemize}
+    \item Ibex: FPGA-basierte Datenbankbeschleunigung. (partielle Verarbeitung von Anfragen auf dem FPGA) \todo{Erklärung}
+    \item DoppioDB: Defintion von ML-Operatoren, welche auf Slots des FPGAs ausgeführt werden.
+    \item Corner cases müssen in Software gelöst werden
+\end{itemize}
+
+
+\section{Zentrale Konzepte}
+
+Heterogene Hardwarearchitekturen:
+Drei Kategorien: On-the-Side (z. B. GPUs), In-Data-Path (z. B. Smart NICs) und Co-Processor (z. B. Oracle DAX).
+\todo{Bilder}
+
+\begin{itemize}
+    \item On the Side (traditionell): CPU besitzt die Daten und sendet sie an den Beschleuniger über bspw. PCIe. (Datenfilterung, Dekompression)
+    \item in Data-Path: Beschleuniger ist Teil des Datenpfads und verarbeitete die Daten live. (vor allem Reduktion der Datenmenge)
+    \item Co-Processor: Beschleuniger ist Teil des Prozessors und kann auf den Arbeitsspeicher zugreifen.
+\end{itemize}
+
+FPGAs als Beispiel:
+Flexible Konfiguration und Kombination von Parallelitätsansätzen (Pipeline, Data-Parallelismus).
+\todo{Verweis auf Bitweaving}
+Teilweise Neukonfiguration ermöglicht dynamische Anpassung. (Partial Reconfiguration; benötigt allerdings einige Millisekunden)
+\todo{Erklärung}
+
+\section{Offene Fragen}
+
+Integration in Datenbanken:
+Wie kann Query-Planung und Ressourcenmanagement angepasst werden?
+Zusammenarbeit mit anderen Forschungsbereichen notwendig (z. B. Hardwaredesign).
+\todo{Warum?}
+
+\section{Fazit}
+
+Neue Perspektive:
+Fortschritte in Hardware und veränderte Workloads eröffnen Chancen für spezialisierte Hardware.
+Zukunftsvision:
+Kooperation zwischen Hardware- und Datenbankforschung notwendig, um das Potenzial voll auszuschöpfen.
+
+
+\end{document}
