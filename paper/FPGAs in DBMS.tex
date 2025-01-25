@@ -9,12 +9,27 @@
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage[justification=centering]{caption} % Paket für Captions
 \usepackage{xcolor}
+\usepackage{url}
 %\usepackage{todonotes}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
+
+\lstset{
+    basicstyle=\normalfont\footnotesize,
+    keywordstyle=\bfseries, % Nur fett, keine Farbe
+    stringstyle=\color{violet},
+    commentstyle=\color{green!70!black},
+    showstringspaces=false,
+    numbers=none,
+    breaklines=true,
+    captionpos=b,
+}
 
 \title{FPGAs in DBMS
 }
@@ -39,7 +54,7 @@
 
 
 \section{Begriffe}
-In \cite{li_bitweaving_2013} und \cite{lisa_column_2018} werden verschidene Begriffe verwendet, die Erklärung bedürfen.
+In~\cite{li_bitweaving_2013} und~\cite{lisa_column_2018} werden verschidene Begriffe verwendet, die Erklärung bedürfen.
 
 
 \subsection{FPGAs}
@@ -47,28 +62,41 @@ In \cite{li_bitweaving_2013} und \cite{lisa_column_2018} werden verschidene Begr
 
 \subsection{Einsatzmöglichkeiten}
 
+FPGAs können in Datenbanksystemen auf verschiedene Weisen eingesetzt werden. Klassischer Weise gibt es On-the-Side Beschleuniger, wobei die CPU die Daten
+besitzt und der FPGA über eine Schnittstelle wie PCIe angebunden ist. Die CPU muss in diesem Szenario die Daten an den FPGA senden und die Ergebnisse wieder
+empfangen. Diese Architektur wurde häufig auch mit GPUs umgesetzt.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.1\textwidth]{imgs/InDatapath.png}
-    \caption{In Datapath Architektur}
-    \label{fig:indatapath}
-\end{figure}
+Eine andere Möglichkeit ist die In Datapath Beschleunigung, bei der der FPGA direkt in den Datenpfad eingebunden ist. Der FPGA kann die Daten in Echtzeit
+verarbeiten und die Ergebnisse mit gleicher Geschwindigkeit an die CPU zurückgeben. Häufig ist das Ziel die Datenmenge zu reduzieren, da nahe der
+Datenquelle häufig höhere Bandbreiten zur Verfügung stehen. Die Architektur ist somit mit Smart-Storage Lösungen verwandt.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.15\textwidth]{imgs/OnTheSide.png}
-    \caption{On The Side Architektur}
-    \label{fig:ontheside}
-\end{figure}
+Eine dritte Möglichkeit ist die Koprozessor Architektur, bei der der FPGA als Koprozessor der CPU fungiert. Der FPGA ist auf demselben Chip wie die CPU
+und hat häufig auch direkten Speicherzugriff. Flaschenhälse durch langsame Schnittstellen können so vermieden werden, was Vorteile gegenüber
+\mbox{On-the-Side} Beschleunigern bietet.
 
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.1\textwidth]{imgs/Coprocessor.png}
-    \caption{Koprozessor Architektur}
-    \label{fig:coprocessor}
-\end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.1\textwidth]{imgs/InDatapath.png}
+%     \caption{In Datapath Architektur}
+%     \label{fig:indatapath}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.15\textwidth]{imgs/OnTheSide.png}
+%     \caption{On The Side Architektur}
+%     \label{fig:ontheside}
+% \end{figure}
+
+
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width=0.1\textwidth]{imgs/Coprocessor.png}
+%     \caption{Koprozessor Architektur}
+%     \label{fig:coprocessor}
+% \end{figure}
 
 \subsection{Pipelining und Datenparallelität}
 Zwei wichtige Arten der Parallelität sind die Pipelineparallelität und die Datenparallelität. Pipelineparalleität beschreibt die Aufteilung der Befehlsabarbeitung
@@ -77,16 +105,17 @@ Ein Beispiel für eine Pipeline ist in Abbildung~\ref{fig:pipeline} zu sehen. Di
 Sobald dies geschehen ist, wird der Befehl an die nächste Stufe weitergegeben. Die Fetch Stufe kann nun den nächsten Befehl bearbeiten. Die Befehle werden so stufenweise
 durch die Pipeline geschoben.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.25\textwidth]{imgs/pipeline.png}
+    \caption{Prozessor Pipeline~\cite{wikipedia_pipeline}}
+    \label{fig:pipeline }
+\end{figure}
+
 Datenparallelität beschreibt die Aufteilung der Daten in mehrere Teile, die mit mehreren Bearbeitungseinheiten parallel verarbeitet werden. Beide Ansätze können die Performance
 von Algorithmen verbessern, und können auch kombiniert werden um die Vorteile beider Ansätze zu nutzen. Um beide Ansätze zu kombinieren, könnten mehrere Pipelines entworfen werden,
 die jeweils verschidene Datenbearbeiten.
 
-\begin{figure}[htbp] % https://en.wikipedia.org/wiki/Instruction_pipelining#/media/File:Pipeline,_4_stage.svg
-    \centering
-    \includegraphics[width=0.25\textwidth]{imgs/pipeline.png}
-    \caption{Prozessor Pipeline}
-    \label{fig:pipeline}
-\end{figure}
 
 
 \subsection{Partial Reconfiguration}
@@ -105,10 +134,48 @@ die sich in der Art und Weise unterscheiden, wie die Daten in den Prozessorworte
 
 
 \section{Einordnung der Situation}
+Die Rolle von FPGAs in Datenbanksystemen ist laut \cite{istvan_glass_2019} aktuell einem Wandel unterzogen. Während bei FPGAs in der Vergangenheit
+Herausforderungen die Potenziale überwogen haben, bieten aktuelle Entwicklungen neue Möglichkeiten für den Einsatz von FPGAs in Datenbanksystemen.
+
+~\cite{istvan_glass_2019} stellt diese Entwicklung als Gegensätze von Pessimismus der Vergangenheit und Optimismus der Gegenwart und Zukunft dar.
+
 \subsection{Pessimismus}
+Der Pessimismus der Vergangenheit begründete sich fundamental in drei Probelemen.
+
+Erstens war die Anbindung der On-the-Side Beschleuniger an die CPU ein Flaschenhals, da die Kommunikation in beiden Richtungen über
+einen Bus erfoglen musste, welcher zu hohe Latenzen und zu geringe Bandbreiten bot. \todo{Quelle} On-the-Side Beschleuniger waren
+die gängige Architektur, um Datenbankoperationen zu beschleunigen, welche nicht im Datenpfad durchgeführt werden können.
+Koprozessor Architekturen wurden von Chipherstellern nicht wirklich angeboten und waren somit nicht weit verbreitet.
+
+Zweitens profitieren nicht alle Algorithmen von der Beschleunigung durch FPGAs. Iterative Algorithmen, die auf den Ergebnissen vorheriger
+Iterationen aufbauen, können nicht von der hohen Parallelität von FPGAs profitieren. \todo{Quelle} CPUs sind in diesen Fällen performanter,
+da die hohen Taktraten die itertiven Instruktionen abarbeiten können. Auch weit verzweigte Algorithmen, mit vielen If-Else Anweisungen
+sind nicht für FPGAs geeignet, da jeder Pfad im FPGA implementiert werden muss, was zu hohen Ressourcenverbrauch führt. Hoher Ressourcenverbrauch
+wiederrum führt zu geringerer Parallelität, da weniger paralelle Pipelines implementiert werden können. Die Inkompatibilität von Algorithmen
+wird durch den ersten Punkt noch verstärkt, da die schwierige Kommunikation zwischen CPU und FPGA die Entwickler dazu zwingt, gesamte Algorithmen
+auf dem FPGA zu implementieren, anstatt nur die Teile, die von der Beschleunigung profitieren, um die Kommunikation zu minimieren.
+
+Drittens ist die direkte Konkurrenz von CPUs ein Hinderniss. CPUs sind sehr flexible, sie können theoretisch jeden Algorithmus
+ausführen. Hinzu kommt, dass die Leistung der CPUs stetig steigt (Moores's Law) und die Taktraten immer höher werden. Durch den hohe
+Zeit- und Ressourcenaufwand, welcher die Entwicklung von FPGA Beschleunigern mit sich bringt, war es häufig nicht praktikabel, FPGAs
+anstelle von CPUs für Datenbankbeschleunigung zu nutzen.
 
 \subsection{Optimismus}
-Andere Architekturen.
+Der Optimismus der Gegenwart und Zukunft basiert auf drei wesentlichen Entwicklungen.
+
+Erstens haben sich die Architekturen verändert. Moderne FPGAs sind häufig als Koprozessoren direkt auf dem gleichen Chip wie die CPU integriert,
+was die Latenzen und Bandbreitenprobleme der On-the-Side Beschleuniger, durch direkten Speicherzugriff des FPGAs, löst. \todo{Quelle}
+Diese enge Integration ermöglicht granulare Beschleunigung, bei der nur die Teile des Algorithmus, die von der Beschleunigung profitieren,
+auf dem FPGA implementiert werden. Die erhöhte Verfügbarkeit von Koprozessor Architekturen bestärkt nun auch die Erforschung und Entwicklung
+von FPGA Beschleunigern was zu einer Vielzahl von neuen Anwendungen führt (siehe~\cite{lisa_column_2018},~\cite{sidler_accelerating_2017}).
+
+
+Zweitens haben sich die Workloads verändert.
+
+Drittens ermöglichen hybride Ansätze eine bessere Nutzung der Stärken von FPGAs und CPUs. Durch die Kombination beider Technologien
+können Algorithmen so aufgeteilt werden, dass die parallelisierbaren Teile auf dem FPGA und die sequentiellen Teile auf der CPU ausgeführt werden.
+\todo{Quelle}
+
 
 \section{Anderes Paper} % BitWeaving
 Im Kontext veränderter Architekturen ordnet sich auch~\cite{lisa_column_2018} ein. Dort wurde auf einem FPGA ein Column Store implementiert, der
@@ -146,6 +213,24 @@ Hybridansatz
 \subsection{IBEX}
 
 \subsection{REGEXP\_LIKE}
+Ein vorgestelltes Projekt befasst sich mit der Optimierung eines Operators, welcher reguläre Ausdrücke auf Datenbanken anwendet. So können beispielsweise
+alle Zeilen einer Tabelle selektiert werden, die in einer Spalte einen bestimmten regulären Ausdruck erfüllen. Der Operator wurde auf einem FPGA implementiert
+und zeigt die Nutzung von hybriden Ansätzen, indem die relevanten Daten so weit wie möglich auf dem FPGA verarbeitet werden und nur falls nötig auf der CPU
+nachbearbeitet werden~\cite{sidler_accelerating_2017}. So können alle REGEXP\_LIKE-Anfragen durch die Beschleunigung profitieren, da nicht vollständig passende
+reguläre Ausdrücke nicht abgewiesen und damit vollständig auf der CPU verarbeitet werden müssen.
+
+Der Reguläre Ausdruck wird an an einer Wildcard-Position aufgeteil, so dass zwei unabhängige reguläre Ausdrücke entstehen. Der FPGA gibt dann, zusammen mit einem Index
+alle Zeilen zurück, die den ersten regulären Audruck erfüllen. Die CPU überprüft dann, ob die Zeilen vom Index aus auch den zweiten regulären Ausdruck erfüllen.
+Der verwendete Ausdruck in~\cite{sidler_accelerating_2017} ist in Listing~\ref{lst:regexp} zu sehen. Der FPGA bearbeitet den Ausdruck bis zur zweiten
+Wildcard und die CPU muss dann nur noch nach `delivery' suchen.
+
+
+\begin{lstlisting}[language=SQL,frame=single,caption={Regulärer Ausdruck aus \cite{sidler_accelerating_2017}},label={lst:regexp}]
+SELECT count(*) 
+FROM address_tables
+WHERE REGEXP_LIKE(address_string,
+'(Strasse|Str\.).*(8[0-9]{4}).*delivery');
+\end{lstlisting}
 
 \section{The Road that lies ahead}
 
