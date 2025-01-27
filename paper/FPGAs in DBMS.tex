@@ -161,7 +161,7 @@ Zeit- und Ressourcenaufwand, welcher die Entwicklung von FPGA Beschleunigern mit
 anstelle von CPUs für Datenbankbeschleunigung zu nutzen.
 
 \subsection{Optimismus}
-Der Optimismus der Gegenwart und Zukunft basiert auf drei wesentlichen Entwicklungen.
+Der Optimismus für die Gegenwart und Zukunft, den der Autor motiviert, basiert auf drei wesentlichen Entwicklungen.
 
 Erstens haben sich die Architekturen verändert. Moderne FPGAs sind häufig als Koprozessoren direkt auf dem gleichen Chip wie die CPU integriert,
 was die Latenzen und Bandbreitenprobleme der On-the-Side Beschleuniger, durch direkten Speicherzugriff des FPGAs, löst. \todo{Quelle}
@@ -170,10 +170,15 @@ auf dem FPGA implementiert werden. Die erhöhte Verfügbarkeit von Koprozessor A
 von FPGA Beschleunigern was zu einer Vielzahl von neuen Anwendungen führt (siehe~\cite{lisa_column_2018},~\cite{sidler_accelerating_2017}).
 
 
-Zweitens haben sich die Workloads verändert.
+Zweitens haben sich die Workloads verändert. Bisher wurden hauptsächlich klassische SQL-Operatoren in Datenbank durchgeführt, welche auf der verfügbaren Hardware
+häufig Memory-bound waren, also durch die Geschwindigkeit der Datentransfers limitiert. Durch neue Anwendungen wie Maschinelles Lernen und Künstliche Intelligenz
+sind neue Workloads entstanden, die häufig Compute-bound sind, also durch die Geschwindigkeit der Berechnungen limitiert. Da diese Anwendungen viele Daten benötigen,
+liegt es nahe, die Anwendungen als neue Daatenbank Operatoren einzuführen. Für Compute-bound Workloads werden FPGAs wieder interessant, da sie durch ihre
+hohe Parallelität und Rekonfigurierbarkeit die Berechnungen beschleunigen können.
 
 Drittens ermöglichen hybride Ansätze eine bessere Nutzung der Stärken von FPGAs und CPUs. Durch die Kombination beider Technologien
-können Algorithmen so aufgeteilt werden, dass die parallelisierbaren Teile auf dem FPGA und die sequentiellen Teile auf der CPU ausgeführt werden.
+können Algorithmen so aufgeteilt werden, dass die parallelisierbaren Teile auf dem FPGA und die sequentiellen Teile auf der CPU ausgeführt werden. Ein Beispiel dafür ist
+REGEXP\_LIKE~\cite{sidler_accelerating_2017}.
 \todo{Quelle}
 
 
@@ -184,6 +189,7 @@ den BitWeaving H Algorithmus nutzt. Es wurden verschidenen Hardwareansätze verg
 \subsection{Architektur}
 Die Forschung von~\cite{lisa_column_2018} baut auf der Zynq Ultrascale+ Architektur von Xilinx auf. Die Plattform ist aus zweiteilig aus Steuersystem mit
 4 ARM Cortex-A53 Kernen und 4GB DDR4 Speicher und Logikbereich mit FPGA und 500MB DDR4 Speicher aufgebaut~\cite{lisa_column_2018}.
+\todo{Mehr}
 
 \subsection{Grundlegendes Vorgehen}
 Pipeline
@@ -211,9 +217,25 @@ Hybridansatz
 \section{Andere Ansätze}
 
 \subsection{IBEX}
+IBEX ist ein FPGA-basierter Beschleuniger für Datenbanken, der in~\cite{istvan_glass_2019} vorgestellt wird. IBEX ist ein In-Data-Path Beschleuniger,
+der direkt in den Datenpfad eingebunden ist, also zwischen SSD und der CPU. Die Daten werden mit gleicher Bandbreite verarbeitet, wie sie von der SSD
+ankommen. Der FPGA führt SQL-Operatoren aus, welche die Datenmenge reduzieren, also beispielsweise Filter und Aggregationen, nicht aber Operatoren,
+die die Datenmenge erhöhen können, wie Joins. IBEX verwendet auch einen hybriden Ansatz, um Aggregate zu berechnen. Die Aggregatfunktionen werden auf dem FPGA
+mit einem Hashtable berechnet, welcher mit fester Größe im RAM verortet ist, was gleiche Laufzeiten, unabhängig von den Daten ermöglicht, da der Hashtable nicht
+dynamisch vergrößert werden muss, aber dadurch die Anazhl der Gruppen bei Aggregatbildung limitiert. Um dieses Limit zu umgehen, gibt der FPGA Teilaggregate
+weiter, sobald der Hashtable keinen Platz mehr für neue Gruppen hat. Die CPU vereinigt dann die Teilaggregate zu einem Endergebnis auf eine Weise, das die Bearbeitung
+von der Arbeit des FPGAs in jedem Fall profitiert. Der FPGA kann so die Datenmenge reduzieren und die CPU kann die reduzierte Datenmenge effizienter verarbeiten.
+
+\subsection{Caribou}
+
+\subsection{DoppioDB}
+Das Projekt DoppioDB zeigt einen solchen Ansatz, indem die Datenbank die FPGA-Steuerung
+übernimmt und Hardware-Threads nutzt, die wie Software-Threads angesprochen werden. Dabei wurde über SQL hinausgehend Funktionalität für maschinelles Lernen integriert, wie z. B.
+stochastische Gradientenabstiege und Entscheidungsbaum-Inferenz.
+\todo{FIXME}
 
 \subsection{REGEXP\_LIKE}
-Ein vorgestelltes Projekt befasst sich mit der Optimierung eines Operators, welcher reguläre Ausdrücke auf Datenbanken anwendet. So können beispielsweise
+Ein vorgestelltes Projekt befasst sich mit der Optimierung des REGEX\_LIKE Operators, welcher reguläre Ausdrücke auf Datenbanken anwendet. So können beispielsweise
 alle Zeilen einer Tabelle selektiert werden, die in einer Spalte einen bestimmten regulären Ausdruck erfüllen. Der Operator wurde auf einem FPGA implementiert
 und zeigt die Nutzung von hybriden Ansätzen, indem die relevanten Daten so weit wie möglich auf dem FPGA verarbeitet werden und nur falls nötig auf der CPU
 nachbearbeitet werden~\cite{sidler_accelerating_2017}. So können alle REGEXP\_LIKE-Anfragen durch die Beschleunigung profitieren, da nicht vollständig passende
@@ -233,6 +255,28 @@ WHERE REGEXP_LIKE(address_string,
 \end{lstlisting}
 
 \section{The Road that lies ahead}
+Ein zentraler Aspekt der zukünftigen Datenbankentwicklung ist die Integration programmierbarer Hardware wie FPGAs, die zwar neu konfigurierbar, jedoch nicht so flexibel wie Software sind.
+Die Kernfrage hierbei ist, wer die Kontrolle über die Beschleunigungsfunktionen übernimmt -- das Betriebssystem bzw. der Hypervisor oder die Datenbank selbst.
+
+\subsection{Betriebssystem- oder Datenbankverwaltung?}
+
+Wenn das Betriebssystem die Kontrolle behält, muss die Datenbank Strategien entwickeln, um von hardwarebasierten Beschleunigungsmöglichkeiten zu profitieren,
+die vom Infrastruktur- oder Cloudanbieter bereitgestellt werden. Hierbei könnten bereits etablierte Techniken zur Code-Optimierung für spezifische CPU-Features,
+wie SIMD-Einheiten, als Grundlage dienen.
+
+Übernimmt hingegen die Datenbank die Kontrolle, eröffnen sich größere Gestaltungsspielräume. Die Datenbank könnte benutzerdefinierte Hardware-Beschleuniger entwickeln,
+die exakt auf ihre Bedürfnisse abgestimmt sind, und diese sogar zur Laufzeit synthetisieren (Siehe DoppioDB)
+% Zukünftige Forschungsfragen umfassen, wie eine Bibliothek hardwarebasierter Operatoren aufgebaut und welche Granularität diese Operatoren haben sollten,
+% um maximale Effizienz zu erreichen. Herausforderungen der Hardware-Programmierung
+
+% FIX 
+% Eine weitere wichtige Fragestellung betrifft die effiziente Ausdrucksweise für Hardware-Beschleuniger im Kontext von Datenbanken. Während CPUs und GPUs feste Architekturen besitzen, ist dies bei FPGAs nicht der Fall, was zusätzliche Komplexität bei der Planung und Kompilierung von Abfragen mit sich bringt. Moderne Ansätze, wie die Entwicklung domänenspezifischer Sprachen (DSLs) für Hardware-Beschleuniger, könnten diesen Prozess erleichtern.
+
+% Eine mögliche Richtung ist die Verwendung von Ansätzen wie der Spatial-Sprache, die die physische Anordnung von Schaltkreisen berücksichtigt. Solche DSLs könnten als Zwischenschritt zwischen SQL und Hardware dienen, um Sub-Operator-Pipelines automatisch auf FPGAs auszulagern.
+
+% Die Übersetzung von Datenbank-Operatoren auf Hardware bleibt jedoch schwierig, insbesondere da Hardware-Ressourcen oft begrenzt sind. Dies erfordert hybride Ansätze, bei denen Corner Cases durch Software nachbearbeitet werden, ohne die Gesamtleistung zu beeinträchtigen. Die Automatisierung geeigneter Aufteilungspunkte zwischen Hardware- und Software-Funktionalitäten ist dabei eine offene Herausforderung.
+
+% Dieser Abschnitt zeigt, dass die Integration programmierbarer Hardware eine Balance zwischen Flexibilität und Leistung erfordert, wobei sowohl Datenbankentwickler als auch Hardware-Designer neue Ansätze und Lösungen erarbeiten müssen.
 
 \bibliographystyle{IEEEtran}
 \bibliography{FPGAs}
