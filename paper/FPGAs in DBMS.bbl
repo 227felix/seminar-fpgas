@@ -21,6 +21,16 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{lisa_column_2018}
+N.~J. Lisa, A.~Ungethüm, D.~Habich, W.~Lehner, T.~D. Nguyen, and A.~Kumar,
+  ``Column {Scan} {Acceleration} in {Hybrid} {CPU}-{FPGA} {Systems}.'' in
+  \emph{{ADMS}@ {VLDB}}, 2018, pp. 22--33.
+
+\bibitem{istvan_glass_2019}
+Z.~István, ``The {Glass} {Half} {Full}: {Using} {Programmable} {Hardware}
+  {Accelerators} in {Analytics}.'' \emph{IEEE Data Eng. Bull.}, vol.~42, no.~1,
+  pp. 49--60, 2019.
+
 \bibitem{li_bitweaving_2013}
 \BIBentryALTinterwordspacing
 Y.~Li and J.~M. Patel, ``{BitWeaving}: fast scans for main memory data
@@ -31,20 +41,10 @@ Y.~Li and J.~M. Patel, ``{BitWeaving}: fast scans for main memory data
   \url{https://doi.org/10.1145/2463676.2465322}
 \BIBentrySTDinterwordspacing
 
-\bibitem{lisa_column_2018}
-N.~J. Lisa, A.~Ungethüm, D.~Habich, W.~Lehner, T.~D. Nguyen, and A.~Kumar,
-  ``Column {Scan} {Acceleration} in {Hybrid} {CPU}-{FPGA} {Systems}.'' in
-  \emph{{ADMS}@ {VLDB}}, 2018, pp. 22--33.
-
 \bibitem{wikipedia_pipeline}
 Cburnett, ``Generic 4-stage pipeline,''
   \url{https://en.wikipedia.org/wiki/Instruction_pipelining#/media/File:Pipeline,_4_stage.svg},
   zugriff: 24-Jan-2025.
-
-\bibitem{istvan_glass_2019}
-Z.~István, ``The {Glass} {Half} {Full}: {Using} {Programmable} {Hardware}
-  {Accelerators} in {Analytics}.'' \emph{IEEE Data Eng. Bull.}, vol.~42, no.~1,
-  pp. 49--60, 2019.
 
 \bibitem{sidler_accelerating_2017}
 \BIBentryALTinterwordspacing
@@ -55,6 +55,13 @@ D.~Sidler, Z.~István, M.~Owaida, and G.~Alonso, ``Accelerating {Pattern}
   0.4em\relax New York, NY, USA: Association for Computing Machinery, May 2017,
   pp. 403--415. [Online]. Available:
   \url{https://doi.org/10.1145/3035918.3035954}
+\BIBentrySTDinterwordspacing
+
+\bibitem{istvan_caribou_2017}
+\BIBentryALTinterwordspacing
+Z.~István, D.~Sidler, and G.~Alonso, ``Caribou: intelligent distributed
+  storage,'' \emph{Proc. VLDB Endow.}, vol.~10, no.~11, pp. 1202--1213, Aug.
+  2017. [Online]. Available: \url{https://doi.org/10.14778/3137628.3137632}
 \BIBentrySTDinterwordspacing
 
 \end{thebibliography}

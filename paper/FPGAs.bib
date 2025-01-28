@@ -1,10 +1,19 @@
 
-@inproceedings{lisa_column_2018,
-  title     = {Column {Scan} {Acceleration} in {Hybrid} {CPU}-{FPGA} {Systems}.},
-  booktitle = {{ADMS}@ {VLDB}},
-  author    = {Lisa, Nusrat Jahan and Ungethüm, Annett and Habich, Dirk and Lehner, Wolfgang and Nguyen, Tuan DA and Kumar, Akash},
-  year      = {2018},
-  pages     = {22--33}
+@article{istvan_caribou_2017,
+  title      = {Caribou: intelligent distributed storage},
+  volume     = {10},
+  issn       = {2150-8097},
+  shorttitle = {Caribou},
+  url        = {https://doi.org/10.14778/3137628.3137632},
+  doi        = {10.14778/3137628.3137632},
+  abstract   = {The ever increasing amount of data being handled in data centers causes an intrinsic inefficiency: moving data around is expensive in terms of bandwidth, latency, and power consumption, especially given the low computational complexity of many database operations.In this paper we explore near-data processing in database engines, i.e., the option of offloading part of the computation directly to the storage nodes. We implement our ideas in Caribou, an intelligent distributed storage layer incorporating many of the lessons learned while building systems with specialized hardware. Caribou provides access to DRAM/NVRAM storage over the network through a simple key-value store interface, with each storage node providing high-bandwidth near-data processing at line rate and fault tolerance through replication. The result is a highly efficient, distributed, intelligent data storage that can be used to both boost performance and reduce power consumption and real estate usage in the data center thanks to the micro-server architecture adopted.},
+  number     = {11},
+  urldate    = {2025-01-27},
+  journal    = {Proc. VLDB Endow.},
+  author     = {István, Zsolt and Sidler, David and Alonso, Gustavo},
+  month      = aug,
+  year       = {2017},
+  pages      = {1202--1213}
 }
 
 @article{istvan_glass_2019,
@@ -35,6 +44,15 @@
   pages      = {289--300}
 }
 
+@inproceedings{lisa_column_2018,
+  title     = {Column {Scan} {Acceleration} in {Hybrid} {CPU}-{FPGA} {Systems}.},
+  booktitle = {{ADMS}@ {VLDB}},
+  author    = {Lisa, Nusrat Jahan and Ungethüm, Annett and Habich, Dirk and Lehner, Wolfgang and Nguyen, Tuan DA and Kumar, Akash},
+  year      = {2018},
+  pages     = {22--33}
+}
+
+
 @inproceedings{sidler_accelerating_2017,
   address   = {New York, NY, USA},
   series    = {{SIGMOD} '17},
@@ -51,7 +69,6 @@
   year      = {2017},
   pages     = {403--415}
 }
-
 
 @misc{wikipedia_pipeline,
   author       = {Cburnett},
